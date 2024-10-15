@@ -1,0 +1,14 @@
+/* App.css */
+
+body {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-color: black; /* Set background color to black */
+    color: white; /* Optional: set text color to white for contrast */
+}
+
+#root {
+    height: 100%; /* Ensure the root fills the viewport height */
+    display: flex; /* Optional: use flexbox if you want to center content */
+    flex-direction: column; /* Optional: arrange children in a column */
+}
