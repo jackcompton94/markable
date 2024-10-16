@@ -8,20 +8,50 @@ import Sidebar from './Sidebar'
 const DW_AUTH_TOKEN = import.meta.env.VITE_DW_AUTH_TOKEN
 const DW_BASE_URL = import.meta.env.VITE_DW_BASE_URL
 
-console.log(DW_BASE_URL)
 export default function MarkdownEditor() {
   const [markdown, setMarkdown] = useState('')
   const [notes, setNotes] = useState([]) 
   const [noteTitle, setNoteTitle] = useState('') 
   const [originalContent, setOriginalContent] = useState('') 
-  const markdownRef = useRef(null);
+  const markdownRef = useRef(null)
+  const editorRef = useRef(null)
+
 
   // Auto-scroll the markdown preview
   useEffect(() => {
-    if (markdownRef.current) {
-      markdownRef.current.scrollTop = markdownRef.current.scrollHeight;
+    if (markdownRef.current && editorRef.current) {
+      // Only auto-scroll if the user is at the bottom of the editor
+      const isAtBottom =
+        editorRef.current.scrollTop + editorRef.current.clientHeight >=
+        editorRef.current.scrollHeight - 100
+
+      if (isAtBottom) {
+        markdownRef.current.scrollTop = markdownRef.current.scrollHeight
+      }
     }
-  }, [markdown]);
+  }, [markdown])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (editorRef.current && markdownRef.current) {
+        const scrollTop = editorRef.current.scrollTop
+        const scrollHeight = editorRef.current.scrollHeight - editorRef.current.clientHeight
+        const scrollPercentage = scrollTop / scrollHeight
+  
+        markdownRef.current.scrollTop = scrollPercentage * (markdownRef.current.scrollHeight - markdownRef.current.clientHeight)
+      }
+    }
+  
+    const editor = editorRef.current
+    if (editor) {
+      editor.addEventListener("scroll", handleScroll)
+    }
+    return () => {
+      if (editor) {
+        editor.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [])
 
   // Fetch all note titles on component mount
   useEffect(() => {
@@ -182,6 +212,7 @@ export default function MarkdownEditor() {
       />
         <textarea
           className="editor-textarea"
+          ref={editorRef}
           value={markdown}
           onChange={(e) => setMarkdown(e.target.value)}
           onKeyDown={handleKeyDown}
