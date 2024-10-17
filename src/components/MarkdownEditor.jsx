@@ -8,14 +8,13 @@ import Sidebar from './Sidebar'
 const DW_AUTH_TOKEN = import.meta.env.VITE_DW_AUTH_TOKEN
 const DW_BASE_URL = import.meta.env.VITE_DW_BASE_URL
 
-export default function MarkdownEditor() {
+export default function MarkdownEditor({username}) {
   const [markdown, setMarkdown] = useState('')
   const [notes, setNotes] = useState([]) 
   const [noteTitle, setNoteTitle] = useState('') 
   const [originalContent, setOriginalContent] = useState('') 
   const markdownRef = useRef(null)
   const editorRef = useRef(null)
-
 
   // Auto-scroll the markdown preview
   useEffect(() => {
@@ -65,7 +64,7 @@ export default function MarkdownEditor() {
       }
 
       try {
-        const response = await fetch(`${DW_BASE_URL}/projects/jack-compton/my-notes`, options)
+        const response = await fetch(`${DW_BASE_URL}/projects/markable-repo/${username}`, options)
         const data = await response.json()
         const titles = data.files.map(file => ({title: file.name}))
         setNotes(titles)
@@ -95,7 +94,7 @@ export default function MarkdownEditor() {
         body: formData,
       }
 
-      await fetch(`${DW_BASE_URL}/uploads/jack-compton/my-notes/files`, options)
+      await fetch(`${DW_BASE_URL}/uploads/markable-repo/${username}/files`, options)
 
       // Update local notes array
       const existingNoteIndex = notes.findIndex(note => note.title === title)
@@ -126,7 +125,7 @@ export default function MarkdownEditor() {
     }
 
     try {
-      const response = await fetch(`${DW_BASE_URL}/file_download/jack-compton/my-notes/${encodeURIComponent(title)}`, options)
+      const response = await fetch(`${DW_BASE_URL}/file_download/markable-repo/${username}/${encodeURIComponent(title)}`, options)
       const data = await response.text()
       setMarkdown(data)
       setOriginalContent(data)
@@ -145,7 +144,7 @@ export default function MarkdownEditor() {
     }
 
     try {
-      const response = await fetch(`${DW_BASE_URL}/datasets/jack-compton/my-notes/files/${encodeURIComponent(title)}`, options)
+      const response = await fetch(`${DW_BASE_URL}/datasets/markable-repo/${username}/files/${encodeURIComponent(title)}`, options)
       
       if (response.ok) {
         console.log(`Deleted note titled "${title}" successfully.`)
