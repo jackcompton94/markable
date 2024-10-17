@@ -5,9 +5,6 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import './MarkdownEditor.css'
 import Sidebar from './Sidebar'
 
-const DW_AUTH_TOKEN = import.meta.env.VITE_DW_AUTH_TOKEN
-const DW_BASE_URL = import.meta.env.VITE_DW_BASE_URL
-
 export default function MarkdownEditor({username}) {
   const [markdown, setMarkdown] = useState('')
   const [notes, setNotes] = useState([]) 
@@ -55,110 +52,104 @@ export default function MarkdownEditor({username}) {
   // Fetch all note titles on component mount
   useEffect(() => {
     const fetchNoteTitles = async () => {
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          authorization: `Bearer ${DW_AUTH_TOKEN}`
+        try {
+            const response = await fetch(`/api/fetchNoteTitles?username=${username}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch note titles');
+            }
+            const titles = await response.json();
+            setNotes(titles);
+        } catch (error) {
+            console.error('Error fetching note titles:', error);
         }
-      }
+    };
 
-      try {
-        const response = await fetch(`${DW_BASE_URL}/projects/markable-repo/${username}`, options)
-        const data = await response.json()
-        const titles = data.files.map(file => ({title: file.name}))
-        setNotes(titles)
-      } catch (error) {
-        console.error('Error fetching note titles:', error)
-      }
+    if (username) {
+        fetchNoteTitles();
     }
+}, [username]);
 
-    fetchNoteTitles()
-  }, [])
+const saveNote = async (title) => {
+  if (!title.trim()) return;
 
-  const saveNote = async (title) => {
-    if (!title.trim()) return
+  const newNote = { title, content: markdown };
 
-    const newNote = { title, content: markdown }
+  try {
+      const response = await fetch('/api/saveNote', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              username,
+              title,
+              content: markdown
+          })
+      });
 
-    try {
-      const formData = new FormData()
-      formData.append('file', new Blob([markdown], { type: 'text/markdown' }), title)
-
-      const options = {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          authorization: `Bearer ${DW_AUTH_TOKEN}`
-        },
-        body: formData,
+      if (!response.ok) {
+          const errorResponse = await response.json();
+          throw new Error(errorResponse.error || 'Failed to save note');
       }
-
-      await fetch(`${DW_BASE_URL}/uploads/markable-repo/${username}/files`, options)
 
       // Update local notes array
-      const existingNoteIndex = notes.findIndex(note => note.title === title)
+      const existingNoteIndex = notes.findIndex(note => note.title === title);
       if (existingNoteIndex > -1) {
-        const updatedNotes = [...notes]
-        updatedNotes[existingNoteIndex] = newNote
-        setNotes(updatedNotes)
+          const updatedNotes = [...notes];
+          updatedNotes[existingNoteIndex] = newNote;
+          setNotes(updatedNotes);
       } else {
-        setNotes(prevNotes => [...prevNotes, newNote])
+          setNotes(prevNotes => [...prevNotes, newNote]);
       }
 
-      setNoteTitle('') 
-      setMarkdown('') 
-      setOriginalContent('')
-    } catch (error) {
-      console.error('Error saving note:', error)
-    }
+      setNoteTitle('');
+      setMarkdown('');
+      setOriginalContent('');
+  } catch (error) {
+      console.error('Error saving note:', error);
   }
+};
 
   const selectNote = async (title) => {
-    setNoteTitle(title)
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: '*/*',
-        authorization: `Bearer ${DW_AUTH_TOKEN}`
-      }
-    }
+    setNoteTitle(title);
 
     try {
-      const response = await fetch(`${DW_BASE_URL}/file_download/markable-repo/${username}/${encodeURIComponent(title)}`, options)
-      const data = await response.text()
-      setMarkdown(data)
-      setOriginalContent(data)
+        const response = await fetch(`/api/fetchNoteContent?username=${username}&title=${encodeURIComponent(title)}`); // Call the API endpoint
+        if (!response.ok) {
+            throw new Error('Failed to fetch note content');
+        }
+        const data = await response.text();
+        setMarkdown(data);
+        setOriginalContent(data);
     } catch (error) {
-      console.error('Error fetching note content:', error)
+        console.error('Error fetching note content:', error);
     }
-  }
+};
 
-  const deleteNote = async (title) => {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${DW_AUTH_TOKEN}`
+const deleteNote = async (title) => {
+  try {
+      const response = await fetch('/api/deleteNote', {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, title })
+      });
+
+      if (!response.ok) {
+          const errorResponse = await response.json();
+          throw new Error(errorResponse.error || 'Failed to delete note');
       }
-    }
 
-    try {
-      const response = await fetch(`${DW_BASE_URL}/datasets/markable-repo/${username}/files/${encodeURIComponent(title)}`, options)
+      console.log(`Deleted note titled "${title}" successfully.`);
       
-      if (response.ok) {
-        console.log(`Deleted note titled "${title}" successfully.`)
-
-        // Optimistically delete
-        setNotes((prevNotes) => prevNotes.filter(note => note.title !== title))
-        createNewNote()
-      } else {
-        console.error('Failed to delete note:', response.statusText)
-        }
-        } catch (error) {
-          console.error('Error deleting note:', error)
-        }
+      // Optimistically delete
+      setNotes((prevNotes) => prevNotes.filter(note => note.title !== title));
+      createNewNote();
+  } catch (error) {
+      console.error('Error deleting note:', error);
   }
+};
 
   const handleKeyDown = (e) => {
 

@@ -4,8 +4,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthState
 import MarkdownEditor from './components/MarkdownEditor';
 import '../src/App.css';
 
-const DW_AUTH_TOKEN = import.meta.env.VITE_DW_AUTH_TOKEN;
-
 function App() {
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ email: '', password: '', confirmPassword: '' });
@@ -15,30 +13,21 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        setUsername(user.uid);
-      } else {
-        setUser(null);
-        setUsername('');
-      }
+      setUser(user);
+      setUsername(user ? user.uid : '');
     });
     return () => unsubscribe();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = ({ target: { name, value } }) => {
     setForm(prevForm => ({ ...prevForm, [name]: value }));
   };
 
   const handleAuth = async (e) => {
     e.preventDefault();
     const { email, password, confirmPassword } = form;
-
-    // Reset error message
     setError('');
 
-    // Check if passwords match when registering
     if (isRegistering && password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -60,29 +49,24 @@ function App() {
 
   const toggleRegistering = () => {
     setIsRegistering(prev => !prev);
-    setError(''); // Reset the error when toggling
+    setError(''); // Reset error when toggling
   };
 
   const createUserProject = async (userId) => {
-    const options = {
+    const response = await fetch('/api/createUserProject', {
       method: 'POST',
       headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        authorization: `Bearer ${DW_AUTH_TOKEN}`
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        visibility: 'OPEN',
-        title: userId
-      })
-    };
-    const response = await fetch('https://api.data.world/v0/projects/markable-repo', options);
-    const projectResponse = await response.json();
+      body: JSON.stringify({ userId }),
+    });
 
     if (!response.ok) {
-      throw new Error(projectResponse.message || 'Failed to create project');
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.error || 'Failed to create project');
     }
 
+    const projectResponse = await response.json();
     console.log("Project created successfully:", projectResponse);
   };
 
@@ -109,7 +93,7 @@ function AuthForm({ form, handleInputChange, handleAuth, isRegistering, toggleRe
     <div className="auth-form-container">
       <h1>Markable</h1>
       <form className="auth-form" onSubmit={handleAuth}>
-        <input
+        <InputField
           type="email"
           name="email"
           placeholder="Email"
@@ -117,7 +101,7 @@ function AuthForm({ form, handleInputChange, handleAuth, isRegistering, toggleRe
           onChange={handleInputChange}
           required
         />
-        <input
+        <InputField
           type="password"
           name="password"
           placeholder="Password"
@@ -126,11 +110,11 @@ function AuthForm({ form, handleInputChange, handleAuth, isRegistering, toggleRe
           required
         />
         {isRegistering && (
-          <input
+          <InputField
             type="password"
             name="confirmPassword"
             placeholder="Confirm Password"
-            value={form.confirmPassword || ""}
+            value={form.confirmPassword}
             onChange={handleInputChange}
             required
           />
@@ -141,12 +125,24 @@ function AuthForm({ form, handleInputChange, handleAuth, isRegistering, toggleRe
           {isRegistering ? "Register" : "Login"}
         </button>
 
-        {/* Switch Mode Link-like Button */}
         <span className="switch-mode-link" onClick={toggleRegistering}>
           {isRegistering ? "Already have an account? Click here to Login" : "Need an account? Click here to Register"}
         </span>
       </form>
     </div>
+  );
+}
+
+function InputField({ type, name, placeholder, value, onChange, required }) {
+  return (
+    <input
+      type={type}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+    />
   );
 }
 
