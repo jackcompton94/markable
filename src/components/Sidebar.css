@@ -1,5 +1,5 @@
-/* Sidebar for notes */
-.sidebar {
+/* Sidebar specific styles */
+.sidebar { /* Ensure this is consistent with MarkdownEditor.css */
     width: 200px; /* Fixed width for the sidebar */
     border-right: 1px solid #444; /* Dark border for sidebar */
     padding: 20px;
@@ -9,8 +9,8 @@
     flex-direction: column;
 }
 
-/* Note title input */
-.note-title-input {
+/* Note title input in sidebar */
+.sidebar .note-title-input {
     margin-bottom: 10px;
     padding: 8px;
     border: 1px solid #555; /* Darker border */
@@ -21,8 +21,8 @@
     box-sizing: border-box; /* Include padding and border in width */
 }
 
-/* Button styling */
-.save-note-btn {
+/* Save note button in sidebar */
+.sidebar .save-note-btn {
     padding: 8px 12px;
     margin-bottom: 10px;
     background-color: #007acc; /* Blue button */
@@ -34,19 +34,19 @@
 }
 
 /* Button hover effect */
-.save-note-btn:hover {
+.sidebar .save-note-btn:hover {
     background-color: #005999; /* Darker blue on hover */
 }
 
-/* List of notes */
-.note-list {
+/* List of notes in sidebar */
+.sidebar .note-list {
     list-style-type: none; /* Remove bullet points */
     padding: 0; /* Remove padding */
     margin-top: 10px; /* Add margin at the top */
 }
 
-/* Individual note item */
-.note-item {
+/* Individual note item in sidebar */
+.sidebar .note-item {
     display: flex; /* Use flexbox to align children */
     justify-content: space-between; /* Space items between left and right */
     align-items: center; /* Center items vertically */
@@ -57,10 +57,11 @@
 }
 
 /* Note item hover effect */
-.note-item:hover {
+.sidebar .note-item:hover {
     background-color: #333; /* Darker background on hover */
 }
 
+/* New note button */
 .new-note-btn {
     padding: 8px 12px;
     margin-bottom: 10px;
@@ -68,11 +69,10 @@
     color: white;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
 }
 
 /* Delete button styles */
-.delete-note-btn {
+.sidebar .delete-note-btn {
     background-color: transparent; /* Make background transparent */
     border: none; /* Remove default border */
     color: red; /* Text color for the delete button */
@@ -82,11 +82,11 @@
     margin-left: 10px; /* Space between delete button and note title */
 }
 
-.delete-note-btn:hover {
+.sidebar .delete-note-btn:hover {
     color: darkred; /* Change color on hover */
     transform: scale(1.1); /* Slightly enlarge on hover */
 }
 
-.delete-note-btn:focus {
+.sidebar .delete-note-btn:focus {
     outline: none; /* Remove default focus outline */
 }

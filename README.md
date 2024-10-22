@@ -4,25 +4,26 @@ Markable is a free alternative to note-taking tools like Notion and Obsidian, de
 
 ## Development
 
-Markable is hosted on Vercel, with authentication handled by Firebase and storage managed by data.world.
+Markable is hosted on Vercel, with authentication and storage handled by Firebase.
 
 ## Local Development
 
 To run Markable locally, you need to set up the following:
 
-1. Install Vercel CLI:
+1. Clone the repo:
    ```bash
-   npm install -g vercel
+   git clone
+   cd markable
    ```
 
-2. Log in to your Vercel account:
+2. Install dependencies:
     ```bash
-    vercel login
+    npm install
     ```
 
 3. Start the development server:
     ```bash
-    vercel dev
+    npm run dev
     ```
 
 4. Create a `.env` file in the root dir
