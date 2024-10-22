@@ -2,6 +2,7 @@
     display: flex;
     height: 100vh;
     font-family: sans-serif;
+    max-width: 100%; /* Ensure it doesn’t exceed the viewport width */
 }
 
 .editor-container {
@@ -10,7 +11,7 @@
 }
 
 .editor-textarea {
-    flex: 0.75;
+    flex: 0.75; /* Use 1 to fill available space equally */
     padding: 12px;
     background-color: #2b2b2b;
     color: #c5c5c5; 
@@ -39,53 +40,6 @@
     min-width: 0;
     min-height: 100%;
     box-sizing: border-box;
-}
-
-.sidebar {
-    width: 250px;
-    border-right: 1px solid #444;
-    padding: 20px;
-    background-color: #1e1e1e; 
-    color: #c5c5c5; 
-    display: flex;
-    flex-direction: column;
-}
-
-.note-title-input {
-    margin-bottom: 10px;
-    padding: 8px;
-    border: 1px solid #555;
-    border-radius: 5px;
-    background-color: #2b2b2b;
-    color: #c5c5c5;
-}
-
-.save-note-btn {
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    background-color: #007acc;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.save-note-btn:hover {
-    background-color: #005999;
-}
-
-.note-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.note-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.note-item:hover {
-    background-color: #333;
 }
 
 /* Code block styling */
