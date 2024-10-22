@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { fetchNotes, saveNote, deleteNote, updateNote } from '../services/firestoreService';
 import Sidebar from './Sidebar';
-import MarkdownEditorTextarea from './MarkdownEditorTextarea';
+import MarkdownEditorTextarea from './MarkdownEditorTextArea';
 import MarkdownPreview from './MarkdownPreview';
 import { handleScroll, autoScrollPreview } from '../utils/scrollUtils';
 import './MarkdownEditor.css'
